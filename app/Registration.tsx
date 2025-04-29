@@ -1,53 +1,52 @@
 import React, { useState } from 'react';
-import { Image, StyleSheet, TextInput, TouchableOpacity, Alert, View, Text } from 'react-native';
+import { Alert, Image, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import AsyncStorage from '@react-native-async-storage/async-storage'; // Import AsyncStorage for token storage
 
-export default function HomeScreen() {
+export default function RegistrationScreen() {
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const router = useRouter();
 
-  // Login Handler Function
-  const handleLogin = async () => {
-    if (!email || !password) {
-      Alert.alert('Error', 'Please fill in both fields.');
+  const handleRegister = async () => {
+    if (!name || !email || !password || !confirmPassword) {
+      Alert.alert('Error', 'Please fill in all fields.');
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      Alert.alert('Error', 'Passwords do not match.');
       return;
     }
 
     try {
-      const response = await fetch('http://10.0.0.29:3000/api/users/login', {
+      const response = await fetch('http://10.0.0.29:3000/api/users', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, password }), // Send email and password to backend
+        body: JSON.stringify({
+          name,
+          email,
+          password,
+          confirmPassword, // ✅ Fixed: now sent to backend
+        }),
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Login failed');
-      }
 
       const data = await response.json();
 
-      // Store the JWT token in AsyncStorage
-      await AsyncStorage.setItem('token', data.token);
-      await AsyncStorage.setItem('userId', data.user.id); // Optionally store user info if needed
+      if (!response.ok) {
+        throw new Error(data.message || 'Registration failed');
+      }
 
-      Alert.alert('Login Successful', `Welcome, ${data.user.name}`);
-
-      // Navigate to TouchScreen (or any other screen you want)
-      router.push('/screens/TouchScreen');
+      Alert.alert('Success', `Welcome aboard, ${data.user.name}!`);
+      router.push('/');
     } catch (error) {
       Alert.alert('Error', error.message);
     }
-  };
-
-  const handleRegistration = () => {
-    router.push('/Registration');
   };
 
   return (
@@ -58,12 +57,16 @@ export default function HomeScreen() {
           style={styles.reactLogo}
         />
         <View style={styles.titleContainer}>
-          <ThemedText type="title" style={styles.title}>Login </ThemedText>
-
-          <ThemedText type="title" style={styles.title} onPress={handleRegistration}>Registration</ThemedText>
+          <ThemedText type="title" style={styles.title}>Register</ThemedText>
         </View>
 
         <ThemedView style={styles.formContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="Name"
+            value={name}
+            onChangeText={setName}
+          />
           <TextInput
             style={styles.input}
             placeholder="Email"
@@ -78,9 +81,16 @@ export default function HomeScreen() {
             onChangeText={setPassword}
             secureTextEntry
           />
+          <TextInput
+            style={styles.input}
+            placeholder="Confirm Password"
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+            secureTextEntry
+          />
 
-          <TouchableOpacity style={styles.button} onPress={handleLogin}>
-            <ThemedText type="buttonText">Login</ThemedText>
+          <TouchableOpacity style={styles.button} onPress={handleRegister}>
+            <ThemedText type="buttonText">Register</ThemedText>
           </TouchableOpacity>
         </ThemedView>
       </ThemedView>
@@ -106,16 +116,12 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
     marginBottom: 20,
   },
   title: {
     fontSize: 26,
     fontWeight: 'bold',
     textAlign: 'center',
-    marginLeft: 20,
-    marginRight: 20,
     color: '#333',
   },
   formContainer: {
@@ -150,6 +156,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 10,
     width: '100%',
-    marginBottom: 30,
   },
 });

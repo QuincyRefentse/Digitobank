@@ -1,53 +1,19 @@
+// LoginScreen.js
 import React, { useState } from 'react';
-import { Image, StyleSheet, TextInput, TouchableOpacity, Alert, View, Text } from 'react-native';
-import { useRouter } from 'expo-router';
+import { Image, StyleSheet, TextInput, TouchableOpacity, Alert, View } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import AsyncStorage from '@react-native-async-storage/async-storage'; // Import AsyncStorage for token storage
 
-export default function HomeScreen() {
+export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const router = useRouter();
 
-  // Login Handler Function
-  const handleLogin = async () => {
+  const handleLogin = () => {
     if (!email || !password) {
       Alert.alert('Error', 'Please fill in both fields.');
       return;
     }
-
-    try {
-      const response = await fetch('http://10.0.0.29:3000/api/users/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }), // Send email and password to backend
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Login failed');
-      }
-
-      const data = await response.json();
-
-      // Store the JWT token in AsyncStorage
-      await AsyncStorage.setItem('token', data.token);
-      await AsyncStorage.setItem('userId', data.user.id); // Optionally store user info if needed
-
-      Alert.alert('Login Successful', `Welcome, ${data.user.name}`);
-
-      // Navigate to TouchScreen (or any other screen you want)
-      router.push('/screens/TouchScreen');
-    } catch (error) {
-      Alert.alert('Error', error.message);
-    }
-  };
-
-  const handleRegistration = () => {
-    router.push('/Registration');
+    Alert.alert('Login Successful', `Welcome, ${email}`);
   };
 
   return (
@@ -57,11 +23,7 @@ export default function HomeScreen() {
           source={require('@/assets/images/digito.png')}
           style={styles.reactLogo}
         />
-        <View style={styles.titleContainer}>
-          <ThemedText type="title" style={styles.title}>Login </ThemedText>
-
-          <ThemedText type="title" style={styles.title} onPress={handleRegistration}>Registration</ThemedText>
-        </View>
+        <ThemedText type="title" style={styles.title}>Login</ThemedText>
 
         <ThemedView style={styles.formContainer}>
           <TextInput
@@ -82,6 +44,12 @@ export default function HomeScreen() {
           <TouchableOpacity style={styles.button} onPress={handleLogin}>
             <ThemedText type="buttonText">Login</ThemedText>
           </TouchableOpacity>
+
+          <TouchableOpacity onPress={() => navigation.navigate('Register')}>
+            <ThemedText type="buttonText" style={styles.registrationText}>
+              Don't have an account? Register
+            </ThemedText>
+          </TouchableOpacity>
         </ThemedView>
       </ThemedView>
     </View>
@@ -101,21 +69,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   reactLogo: {
-    height: 300,
-    width: 300,
+    height: 200,
+    width: 200,
     marginBottom: 30,
-  },
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 20,
   },
   title: {
     fontSize: 26,
     fontWeight: 'bold',
+    marginBottom: 20,
     textAlign: 'center',
-    marginLeft: 20,
-    marginRight: 20,
     color: '#333',
   },
   formContainer: {
@@ -151,5 +113,9 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     width: '100%',
     marginBottom: 30,
+  },
+  registrationText: {
+    color: '#007BFF',
+    marginTop: 10,
   },
 });
