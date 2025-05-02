@@ -18,7 +18,7 @@ export default function HomeScreen() {
     }
 
     try {
-      const response = await fetch('https://digitobank.vercel.app/api/users/login', {
+      const response = await fetch('http://10.0.0.29:3000/api/users/login', {
 
       /* https://digitobank.vercel.app/  http://10.0.0.29:3000/api/users/login */
         method: 'POST',
