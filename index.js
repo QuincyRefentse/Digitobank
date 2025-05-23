@@ -1,5 +1,6 @@
 import express from 'express';
 import mongoose from 'mongoose';
+import cors from 'cors';  // Import cors
 import User from './models/user.model.js';
 import transactionRoutes from './routes/transaction.routes.js';
 import userRoute from "./routes/user.routes.js";
@@ -8,6 +9,8 @@ const app = express();
 //middleware
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
+// Middleware
+app.use(cors()); // Allow all origins by default
 
 //
 //routes

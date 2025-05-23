@@ -1,12 +1,16 @@
-import { Stack } from 'expo-router';
+// app/layout.tsx
 import React from 'react';
+import { Stack } from 'expo-router';
+import { UserProvider } from '../context/UserContext'; // Adjust path if needed
 
 export default function RootLayout() {
   return (
-    <Stack
-      screenOptions={{
-        headerShown: false, // Hides headers for all screens (you can customize per screen if needed)
-      }}
-    />
+    <UserProvider>
+      <Stack
+        screenOptions={{
+          headerShown: false,
+        }}
+      />
+    </UserProvider>
   );
 }

@@ -23,7 +23,7 @@ export default function RegistrationScreen() {
     }
 
     try {
-      const response = await fetch('https://digitobank.vercel.app/api/users', {
+      const response = await fetch('http://10.0.0.29:3000/api/users', {
 
       /* http://10.0.0.29:3000 https://digitobank.vercel.app/  http://10.0.0.29:3000/api/users/login */
         method: 'POST',

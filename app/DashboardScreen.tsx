@@ -2,13 +2,19 @@ import React from 'react';
 import { SafeAreaView, View, Text, Image, StyleSheet, StatusBar, TextInput, ScrollView, Dimensions } from 'react-native';
 import { Ionicons, MaterialIcons, AntDesign } from '@expo/vector-icons';
 import { LineChart } from 'react-native-chart-kit';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import BottomTabs from '@/components/BottomTabs';
 import Purchases from '@/components/Purchases';
+import { useUser } from './context/UserContext';
 
 const screenWidth = Dimensions.get('window').width;
 
 export default function DashboardScreen() {
+ // Get user from context
+
+
+  const { user } = useUser();
+   console.log('User from context:', user);
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" />
@@ -22,7 +28,9 @@ export default function DashboardScreen() {
             />
             <View style={styles.textContainer}>
               <Text style={styles.welcomeText}>Welcome,</Text>
-              <Text style={styles.userName}>DesignIntoCode </Text>
+              <Text style={styles.userName}>{user?.name ?? "Guest" }  </Text>
+               <Text style={{ color: '#666' }}>Acc No: {user?.accountNumber ?? 'N/A'}</Text>
+
             </View>
           </View>
           <Ionicons name="settings" size={24} color="black" />
@@ -95,6 +103,8 @@ export default function DashboardScreen() {
     </SafeAreaView>
   );
 }
+
+
 
 const styles = StyleSheet.create({
   container: {
