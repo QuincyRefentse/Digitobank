@@ -198,12 +198,14 @@ import { useRouter } from 'expo-router';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useUser } from '@/context/UserContext';  // Import the hook
 
 export default function HomeScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const router = useRouter();
   const [isHovered, setIsHovered] = useState(false);
+  const { setUser } = useUser();  // Get setUser from context
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -231,6 +233,8 @@ export default function HomeScreen() {
       await AsyncStorage.setItem('user', JSON.stringify(data.user));
       console.log('Logged in user:', data.user);
       console.log("hello");
+      // ALSO update context state
+       await setUser(data.user);
 
       Alert.alert('Login Successful', `Welcome, ${data.user.name}`);
 

@@ -1,3 +1,384 @@
+import React, { useEffect } from 'react';
+import {
+  SafeAreaView,
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  StatusBar,
+  TextInput,
+  ScrollView,
+  Dimensions,
+} from 'react-native';
+import { Ionicons, MaterialIcons, AntDesign } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import BottomTabs from '@/components/BottomTabs';
+import Purchases from '@/components/Purchases';
+import { useUser } from '@/context/UserContext';
+
+const screenWidth = Dimensions.get('window').width;
+
+export default function DashboardScreen() {
+  const { user, setUser } = useUser();
+
+  useEffect(() => {
+    const fetchUserFromStorage = async () => {
+      try {
+        if (!user) {
+          const userData = await AsyncStorage.getItem('user');
+          if (userData) {
+            const parsedUser = JSON.parse(userData);
+            setUser(parsedUser);
+            console.log('Fetched user from AsyncStorage:', parsedUser);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to fetch user from storage', err);
+      }
+    };
+
+    fetchUserFromStorage();
+  }, [user, setUser]); // added dependencies for good practice
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="light-content" />
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        {/* Header */}
+        <View style={styles.header}>
+          <View style={styles.profileSection}>
+            <Image
+              source={require('@/assets/images/DigitoBank.png')}
+              style={styles.profilePhoto}
+            />
+            <View style={styles.textContainer}>
+              <Text style={styles.welcomeText}>Welcome,</Text>
+              <Text style={styles.userName}>
+                {user?.name ?? 'Guest'}
+              </Text>
+              <Text style={{ color: '#666' }}>
+                Acc No: {user?.accountNumber ?? 'N/A'}
+              </Text>
+            </View>
+          </View>
+          <Ionicons name="settings" size={24} color="black" />
+        </View>
+
+        {/* Balance */}
+        <View style={styles.balanceContainer}>
+          <Text style={styles.balanceText}>
+            {/* Format balance with commas if number exists, else 0 */}
+            R{user?.balance ? Number(user.balance).toLocaleString() : '0'}
+          </Text>
+          <Text style={styles.balanceLabel}>Current Balance</Text>
+        </View>
+
+        {/* Transactions Header with Search */}
+        <Purchases
+          ListHeaderComponent={
+            <>
+              <View style={styles.transactionsHeader}>
+                <Text style={styles.lastPurchasesText}>Last Purchases</Text>
+                <MaterialIcons name="sort" size={24} color="#5196f4" />
+              </View>
+              <View style={styles.searchContainer}>
+                <AntDesign
+                  name="search1"
+                  size={18}
+                  color="#5196f4"
+                  style={styles.searchIcon}
+                />
+                <TextInput
+                  style={styles.searchInput}
+                  placeholder="Search Transactions"
+                  placeholderTextColor="#999"
+                />
+              </View>
+            </>
+          }
+        />
+      </ScrollView>
+      <BottomTabs />
+    </SafeAreaView>
+  );
+}
+
+// Your styles remain unchanged
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#eeeeee',
+    paddingTop: 50,
+    paddingHorizontal: 20,
+  },
+  scrollContainer: {
+    flexGrow: 1,
+    paddingBottom: 20,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  profileSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  profilePhoto: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    marginRight: 16,
+  },
+  textContainer: {
+    flexDirection: 'column',
+  },
+  welcomeText: {
+    fontSize: 20,
+    color: '#333',
+  },
+  userName: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#111',
+  },
+  balanceContainer: {
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  balanceText: {
+    fontSize: 36,
+    fontWeight: 'bold',
+    color: '#111',
+  },
+  balanceLabel: {
+    fontSize: 14,
+    color: '#888',
+    marginTop: 4,
+  },
+  transactionsHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+    marginTop: 20,
+  },
+  lastPurchasesText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: '#ccc',
+  },
+  searchIcon: {
+    marginRight: 8,
+  },
+  searchInput: {
+    flex: 1,
+    height: 40,
+    fontSize: 16,
+  },
+});
+
+/*
+import React, { useEffect } from 'react';
+import {
+  SafeAreaView,
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  StatusBar,
+  TextInput,
+  ScrollView,
+  Dimensions,
+} from 'react-native';
+import { Ionicons, MaterialIcons, AntDesign } from '@expo/vector-icons';
+import { LineChart } from 'react-native-chart-kit';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import BottomTabs from '@/components/BottomTabs';
+import Purchases from '@/components/Purchases';
+import { useUser } from '@/context/UserContext';
+
+const screenWidth = Dimensions.get('window').width;
+
+export default function DashboardScreen() {
+  const { user, setUser } = useUser();
+
+  useEffect(() => {
+    const fetchUserFromStorage = async () => {
+      try {
+        if (!user) {
+          const userData = await AsyncStorage.getItem('user');
+          if (userData) {
+            const parsedUser = JSON.parse(userData);
+            setUser(parsedUser);
+            console.log('Fetched user from AsyncStorage:', parsedUser);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to fetch user from storage', err);
+      }
+    };
+
+    fetchUserFromStorage();
+  }, []);
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="light-content" />
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        {/* Header *
+        <View style={styles.header}>
+          <View style={styles.profileSection}>
+            <Image
+              source={require('@/assets/images/DigitoBank.png')}
+              style={styles.profilePhoto}
+            />
+            <View style={styles.textContainer}>
+              <Text style={styles.welcomeText}>Welcome,</Text>
+              <Text style={styles.userName}>{user?.name ?? 'Guest'}</Text>
+              <Text style={{ color: '#666' }}>
+                Acc No: {user?.accountNumber ?? 'N/A'}
+              </Text>
+            </View>
+          </View>
+          <Ionicons name="settings" size={24} color="black" />
+        </View>
+
+        {/* Balance
+        <View style={styles.balanceContainer}>
+          <Text style={styles.balanceText}> R{user?.balance ?? '0'}</Text>
+          <Text style={styles.balanceLabel}>Current Balance</Text>
+        </View>
+
+        {/* Transactions Header with Search
+        <Purchases
+          ListHeaderComponent={
+            <>
+              <View style={styles.transactionsHeader}>
+                <Text style={styles.lastPurchasesText}>Last Purchases</Text>
+                <MaterialIcons name="sort" size={24} color="#5196f4" />
+              </View>
+              <View style={styles.searchContainer}>
+                <AntDesign
+                  name="search1"
+                  size={18}
+                  color="#5196f4"
+                  style={styles.searchIcon}
+                />
+                <TextInput
+                  style={styles.searchInput}
+                  placeholder="Search Transactions"
+                  placeholderTextColor="#999"
+                />
+              </View>
+            </>
+          }
+        />
+      </ScrollView>
+      <BottomTabs />
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#eeeeee',
+    paddingTop: 50,
+    paddingHorizontal: 20,
+  },
+  scrollContainer: {
+    flexGrow: 1,
+    paddingBottom: 20,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  profileSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  profilePhoto: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    marginRight: 16,
+  },
+  textContainer: {
+    flexDirection: 'column',
+  },
+  welcomeText: {
+    fontSize: 20,
+    color: '#333',
+  },
+  userName: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#111',
+  },
+  balanceContainer: {
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  balanceText: {
+    fontSize: 36,
+    fontWeight: 'bold',
+    color: '#111',
+  },
+  balanceLabel: {
+    fontSize: 14,
+    color: '#888',
+    marginTop: 4,
+  },
+  transactionsHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+    marginTop: 20,
+  },
+  lastPurchasesText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: '#ccc',
+  },
+  searchIcon: {
+    marginRight: 8,
+  },
+  searchInput: {
+    flex: 1,
+    height: 40,
+    fontSize: 16,
+  },
+});
+
+*/
+
+/*
 import React from 'react';
 import { SafeAreaView, View, Text, Image, StyleSheet, StatusBar, TextInput, ScrollView, Dimensions } from 'react-native';
 import { Ionicons, MaterialIcons, AntDesign } from '@expo/vector-icons';
@@ -5,13 +386,14 @@ import { LineChart } from 'react-native-chart-kit';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import BottomTabs from '@/components/BottomTabs';
 import Purchases from '@/components/Purchases';
-import { useUser } from './context/UserContext';
+import { useUser } from '@/context/UserContext';
+
 
 const screenWidth = Dimensions.get('window').width;
 
 export default function DashboardScreen() {
  // Get user from context
-
+//const { user } = useUser();
 
   const { user } = useUser();
    console.log('User from context:', user);
@@ -19,7 +401,7 @@ export default function DashboardScreen() {
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" />
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        {/* Header */}
+        {/* Header
         <View style={styles.header}>
           <View style={styles.profileSection}>
             <Image
@@ -78,9 +460,9 @@ export default function DashboardScreen() {
           bezier
           style={styles.chart}
         />
-        */}
 
-        {/* Transactions Header with Search */}
+
+        {/* Transactions Header with Search
         <Purchases ListHeaderComponent={
           <>
             <View style={styles.transactionsHeader}>
@@ -200,3 +582,4 @@ const styles = StyleSheet.create({
     color: '#333',
   },
 });
+*/

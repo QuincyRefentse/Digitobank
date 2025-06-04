@@ -1,16 +1,19 @@
 // app/layout.tsx
 import React from 'react';
-import { Stack } from 'expo-router';
-import { UserProvider } from '../context/UserContext'; // Adjust path if needed
+import { Stack,Slot } from 'expo-router';
+import { UserProvider } from '@/context/UserContext'; // Adjust path if needed
 
 export default function RootLayout() {
   return (
     <UserProvider>
-      <Stack
+     {/*  <Stack
         screenOptions={{
           headerShown: false,
         }}
       />
+      */}
+
+      <Slot />
     </UserProvider>
   );
 }
